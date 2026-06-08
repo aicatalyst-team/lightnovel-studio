@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>轻小说创作台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans SC"', 'system-ui', 'sans-serif'],
+            serif: ['"Noto Serif SC"', 'Georgia', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            // 主色系：深墨色侧边栏
+            void:  { DEFAULT: '#0e0c0a', 700: '#1a1714', 800: '#141210', 900: '#0e0c0a' },
+            // 纸白主区
+            paper: { DEFAULT: '#f9f7f4', 50: '#fdfcfa', 100: '#f9f7f4', 200: '#f0ece6', 300: '#e4ddd3', 400: '#ccc2b4', 500: '#b3a694' },
+            // 玫瑰点缀（比原sakura更有力度）
+            rose:  { 50: '#fff1f5', 100: '#ffe4ed', 200: '#ffc7d8', 300: '#ffa0ba', 400: '#ff6b96', 500: '#f43f72', 600: '#e11d5a', 700: '#be1249', 800: '#9f1239', 900: '#881337' },
+            // 功能中性
+            stone: { 50: '#fafaf9', 100: '#f5f5f4', 200: '#e7e5e4', 300: '#d6d3d1', 400: '#a8a29e', 500: '#78716c', 600: '#57534e', 700: '#44403c', 800: '#292524', 900: '#1c1917', 950: '#0c0a09' },
+            // 辅助：森绿（已完成状态）
+            moss:  { 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a' },
+            // 辅助：淡蓝（提示信息）
+            slate: { 100: '#f1f5f9', 200: '#e2e8f0', 400: '#94a3b8', 500: '#64748b', 600: '#475569' },
+          },
+          boxShadow: {
+            'panel': '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06)',
+            'sidebar-item': 'inset 3px 0 0 #e11d5a',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body, #root { height: 100%; margin: 0; }
+    body { background: #f9f7f4; color: #1c1917; font-family: 'Noto Sans SC', system-ui, sans-serif; }
+
+    /* 写作区专用 */
+    .writing-area {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 16px;
+      line-height: 2.4;
+      letter-spacing: 0.06em;
+      color: #1c1917;
+      /* 最佳阅读宽度约束：65字符 */
+      max-width: 72ch;
+    }
+    .writing-area::placeholder { color: #b3a694; font-style: italic; }
+
+    /* 段落缩进 */
+    .writing-area p { text-indent: 2em; margin-bottom: 1.2em; }
+
+    /* 极细滚动条 */
+    .scrollbar-thin::-webkit-scrollbar { width: 3px; height: 3px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 2px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+
+    /* 淡入动画 */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeUp 0.2s ease forwards; }
+
+    /* 侧边栏导航激活态 */
+    .nav-item-active {
+      background: rgba(225,29,90,0.12);
+      box-shadow: inset 3px 0 0 #e11d5a;
+    }
+
+    /* 表单基础 */
+    .field-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e7e5e4;
+      background: #fff;
+      font-size: 13px;
+      color: #1c1917;
+      font-family: 'Noto Sans SC', sans-serif;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    .field-input:focus {
+      border-color: #e11d5a;
+      box-shadow: 0 0 0 2px rgba(225,29,90,0.12);
+    }
+    .field-input::placeholder { color: #c4bfbb; }
+
+    /* 按钮基础 */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      background: #e11d5a;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover  { background: #be1249; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      background: transparent;
+      color: #78716c;
+      font-size: 13px;
+      border: 1px solid #e7e5e4;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-ghost:hover { border-color: #b3a694; color: #44403c; }
+    .btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* 标签页 */
+    .tab-item {
+      padding: 6px 14px;
+      font-size: 13px;
+      color: #a8a29e;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-item:hover  { color: #57534e; }
+    .tab-item.active { color: #e11d5a; border-bottom-color: #e11d5a; font-weight: 500; }
+
+    /* 章节卡片 */
+    .chapter-card {
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .chapter-card:hover    { background: rgba(0,0,0,0.03); }
+    .chapter-card.selected { background: rgba(225,29,90,0.08); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

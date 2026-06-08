@@ -1,0 +1,20 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+
+# 工具本地状态
+.gstack/
+
+# 真实检查取材（生成的小说全文，不开源；截图见 screenshots/）
+review/
+
+# 环境与密钥
+.env
+.env.*
+*.local
+
+# 系统
+.DS_Store
+Thumbs.db
