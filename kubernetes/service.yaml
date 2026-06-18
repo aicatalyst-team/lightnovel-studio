@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lightnovel-studio
+  namespace: poc-lightnovel-studio
+  labels:
+    app: lightnovel-studio
+    autopoc.io/project: lightnovel-studio
+spec:
+  type: ClusterIP
+  selector:
+    app: lightnovel-studio
+  ports:
+    - port: 8080
+      targetPort: 8080
