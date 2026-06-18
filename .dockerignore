@@ -1,0 +1,9 @@
+.git
+*.md
+LICENSE
+kubernetes/
+poc-plan.md
+screenshots/
+node_modules/
+.env*
+.autopoc/

@@ -1,0 +1,32 @@
+# Stage 1: Build the Vite/React SPA
+FROM registry.access.redhat.com/ubi9/nodejs-22 AS builder
+
+WORKDIR /opt/app-root/src
+
+# Copy dependency files first for layer caching
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy application source
+COPY . .
+
+# Build the production bundle
+RUN npm run build
+
+# Stage 2: Serve with nginx
+FROM registry.access.redhat.com/ubi9/nginx-124
+
+# Copy the built static files to nginx html directory
+COPY --from=builder /opt/app-root/src/dist /opt/app-root/src
+
+# Copy custom nginx config for SPA routing
+COPY nginx.conf /etc/opt/rh/nginx124/nginx/nginx.conf
+
+# OpenShift compatibility: group 0 permissions
+RUN chgrp -R 0 /opt/app-root && chmod -R g=u /opt/app-root
+
+EXPOSE 8080
+
+USER 1001
+
+CMD ["nginx", "-g", "daemon off;"]
