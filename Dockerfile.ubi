@@ -29,4 +29,4 @@ USER 1001
 
 EXPOSE 8080
 
-# Use the UBI nginx image's default CMD (nginx-run script)
+CMD ["nginx", "-g", "daemon off;"]
